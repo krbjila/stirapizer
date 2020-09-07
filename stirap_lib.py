@@ -239,3 +239,13 @@ def write_dr_to_fg(gpib_addr, voltages, sysmsg):
 			print("Device {0:d} not found.".format(device))
 			return 0
 	return 1
+
+def set_voltage_defaults(voltage_data, mode):
+	
+	if mode == 'STIRAP':
+		voltage_data.up_max_v.setText('{0:.1f}'.format(UP_V_STIRAP))
+		voltage_data.down_max_v.setText('{0:.1f}'.format(DOWN_V_STIRAP))
+	elif mode == 'Dark Resonance':
+		voltage_data.up_max_v.setText('{0:.1f}'.format(UP_V_DR))
+		voltage_data.down_max_v.setText('{0:.1f}'.format(DOWN_V_DR))		
+

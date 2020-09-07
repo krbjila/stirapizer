@@ -9,7 +9,7 @@ import numpy as np
 class stirap_gui(QtGui.QMainWindow):
 		def __init__(self, Parent=None):
 				super(stirap_gui, self).__init__(Parent)
-
+				self.setWindowTitle('STIRAPizer')
 				self.initialize()
 
 
@@ -23,6 +23,7 @@ class stirap_gui(QtGui.QMainWindow):
 				self.set_voltage.down_max_v.returnPressed.connect(self.update_sequence)
 
 				self.connect_update.clicked.connect(self.FG_write)
+				self.mode_select.currentIndexChanged.connect(self.mode_changed_update)
 
 
 				self.update_sequence()
@@ -32,7 +33,8 @@ class stirap_gui(QtGui.QMainWindow):
 			x = generate_stirap_sequence(self.set_voltage, self.set_time)
 			if x:
 				self.up_sequence, self.down_sequence = x[0], x[1]
-				self.update_plot()
+			
+			self.update_plot()
 
 		def FG_write(self):
 			self.update_sequence()
@@ -45,14 +47,21 @@ class stirap_gui(QtGui.QMainWindow):
 
 			elif self.mode_select.currentText() == 'Dark Resonance':
 				write_dr_to_fg(gpib_addr, voltages, self.status_bar)
-			
+		
+		def mode_changed_update(self):
+			set_voltage_defaults(self.set_voltage, self.mode_select.currentText())
+			self.update_sequence()	
 
 		def update_plot(self):
 
 			self.plot_window.ax.cla()
 
-			self.plot_window.ax.plot(np.arange(N)*DT, self.up_sequence*V_MAX, 'r')
-			self.plot_window.ax.plot(np.arange(N)*DT, self.down_sequence*V_MAX, 'b')
+			if self.mode_select.currentText() == "STIRAP":
+				self.plot_window.ax.plot(np.arange(N)*DT, self.up_sequence*V_MAX, 'r')
+				self.plot_window.ax.plot(np.arange(N)*DT, self.down_sequence*V_MAX, 'b')
+			elif self.mode_select.currentText() == "Dark Resonance":
+				self.plot_window.ax.plot(np.arange(N)*DT, float(self.set_voltage.up_max_v.text()) * np.ones(N), 'r')
+				self.plot_window.ax.plot(np.arange(N)*DT, float(self.set_voltage.down_max_v.text()) * np.ones(N), 'b')				
 
 			self.plot_window.ax.set_xlabel(r'Time ($\mu$s)')
 			self.plot_window.ax.set_ylabel(r'Voltage (mV)')
@@ -76,9 +85,13 @@ class stirap_gui(QtGui.QMainWindow):
 			self.up_sequence = np.zeros(N)
 			self.down_sequence = np.zeros(N)
 
+			title = QtGui.QLabel('STIRAPizer')
+			title_font = QtGui.QFont("Helvetica [Cronyx]", 16, QtGui.QFont.Bold)
+			title.setText("<font color=\"blue\">STI</font><font color=\"red\">RAP</font><font color=\"black\">izer</font>")
+			title.setFont(title_font)
 
 			h0Left = QtGui.QHBoxLayout()
-			h0Left.addWidget(QtGui.QLabel('STIRAP'))
+			h0Left.addWidget(title)
 			h0Left.addWidget(self.connect_update)
 
 			h1Left = QtGui.QHBoxLayout()
