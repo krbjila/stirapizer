@@ -12,7 +12,7 @@ DOWN_V_DR = 500.0
 
 ################## STIRAP Parameters #################
 UP_V_STIRAP = 1750.0
-DOWN_V_STIRAP = 1500.0
+DOWN_V_STIRAP = 900.0
 
 T_ON = 4.0
 T_STIRAP = 4.0
