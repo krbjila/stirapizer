@@ -77,7 +77,7 @@ class stirap_gui(QtGui.QMainWindow):
 			self.connect_update = QtGui.QPushButton('Connect and Update!')
 			self.up_leg_address = QtGui.QLineEdit('{0:d}'.format(UP_ADDRESS))
 			self.down_leg_address = QtGui.QLineEdit('{0:d}'.format(DOWN_ADDRESS))
-			self.down_leg_v = QtGui.QLineEdit('50.0')
+			self.down_leg_v = QtGui.QLineEdit(str(DOWN_V_KILLING))
 			self.status_bar = QtGui.QTextBrowser()
 			self.plot_window = plot_window()
 

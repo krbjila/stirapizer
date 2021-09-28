@@ -128,10 +128,10 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	n_sequence = n_on + n_hold + n_stirap + n_off
 
 	t_up = 5
-	t_down = 90
+	t_down = 100 - 2 * t_up
 	n_up = int(t_up/DT)
 	n_down = int(t_down/DT)
-	v_up_dr = 1750.0/V_MAX
+	v_up_dr = 1500.0/V_MAX
 	v_down_dr = min(down_leg_v,V_MAX)/V_MAX
 
 	# Program in the up leg sequence
@@ -149,9 +149,9 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	sequence_down[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
 
 	# Program in the dark resonance at the end
-	sequence_up[-n_up:] = np.linspace(UP_V_DR/V_MAX, 0, n_up)
+	sequence_up[-n_up:] = np.linspace(v_up_dr, 0, n_up)
 	sequence_up[-(n_up+n_down):-n_up] = v_up_dr * np.ones(n_down)
-	sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, UP_V_DR/V_MAX, n_up)
+	sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, v_up_dr, n_up)
 
 	sequence_down[-(n_up+n_down):-n_up] = v_down_dr * np.ones(n_down)
 

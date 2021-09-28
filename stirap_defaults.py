@@ -9,6 +9,8 @@ DOWN_ADDRESS = 10
 UP_V_DR = 15.0
 DOWN_V_DR = 500.0
 
+DOWN_V_KILLING = 110.0
+
 
 ################## STIRAP Parameters #################
 UP_V_STIRAP = 1500.0
