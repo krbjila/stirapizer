@@ -79,7 +79,7 @@ class plot_window(QtGui.QWidget):
 
 		self.setLayout(self.layout)
 
-def generate_stirap_sequence(voltage_data, time_data):
+def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	voltages = [] # List containing [up max voltage, down max voltage]
 	times = []
 
@@ -102,8 +102,8 @@ def generate_stirap_sequence(voltage_data, time_data):
 
 	t_sequence = sum(times)
 
-	if t_sequence >= T_MAX/2.0:
-		print('ERROR: Sequence time longer than T_MAX/2.')
+	if t_sequence >= T_MAX/4.0:
+		print('ERROR: Sequence time longer than T_MAX/4.')
 		return 0
 	else:
 		time_data.t_seq.setText('{0:.1f}'.format(t_sequence))
@@ -127,10 +127,17 @@ def generate_stirap_sequence(voltage_data, time_data):
 	n_off = int(times[2]/DT)
 	n_sequence = n_on + n_hold + n_stirap + n_off
 
+	t_up = 5
+	t_down = 90
+	n_up = int(t_up/DT)
+	n_down = int(t_down/DT)
+	v_up_dr = 1750.0/V_MAX
+	v_down_dr = min(down_leg_v,V_MAX)/V_MAX
+
 	# Program in the up leg sequence
 	sequence_up[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(0.0, v_up, n_stirap)
 	sequence_up[n_on+n_hold+n_stirap : n_sequence] = np.linspace(v_up, v_up, n_off)
-	sequence_up[n_sequence : N/2] = v_up * np.ones(N/2 - n_sequence)
+	sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
 
 	# Program in the down leg sequence
 	sequence_down[0 : n_on] = np.linspace(0.0, v_down, n_on)
@@ -138,8 +145,15 @@ def generate_stirap_sequence(voltage_data, time_data):
 	sequence_down[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(v_down, 0.0, n_stirap)
 
 	# Mirror the sequences to generate dissociation pulse
-	sequence_up[N/2 : N/2+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
-	sequence_down[N/2 : N/2+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+	sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
+	sequence_down[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+
+	# Program in the dark resonance at the end
+	sequence_up[-n_up:] = np.linspace(UP_V_DR/V_MAX, 0, n_up)
+	sequence_up[-(n_up+n_down):-n_up] = v_up_dr * np.ones(n_down)
+	sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, UP_V_DR/V_MAX, n_up)
+
+	sequence_down[-(n_up+n_down):-n_up] = v_down_dr * np.ones(n_down)
 
 	return sequence_up, sequence_down
 

@@ -23,7 +23,7 @@ T_OFF = 7.0
 ##################### FG Defaults ####################
 ########### DO NOT MODIFY THESE PARAMETERS ###########
 
-T_MAX = 100.0		# Total sequence time [us]
+T_MAX = 200.0		# Total sequence time [us]
 V_MAX = 2000.0		# Maximum voltage [mV]
 V_MIN = 0.0			# Minimum voltage [mV]
 N = 2**16			# Number of bytes in memory
