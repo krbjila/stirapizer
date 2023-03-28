@@ -17,10 +17,11 @@ class stirap_gui(QtGui.QMainWindow):
 				self.set_time.t_on.returnPressed.connect(self.update_sequence)
 				self.set_time.t_hold.returnPressed.connect(self.update_sequence)
 				self.set_time.t_stirap.returnPressed.connect(self.update_sequence)
-				self.set_time.t_off.returnPressed.connect(self.update_sequence)
+				self.set_time.t_delay.returnPressed.connect(self.update_sequence)
 
 				self.set_voltage.up_max_v.returnPressed.connect(self.update_sequence)
 				self.set_voltage.down_max_v.returnPressed.connect(self.update_sequence)
+				self.down_leg_v.returnPressed.connect(self.update_sequence)
 
 				self.connect_update.clicked.connect(self.FG_write)
 				self.mode_select.currentIndexChanged.connect(self.mode_changed_update)
@@ -30,7 +31,7 @@ class stirap_gui(QtGui.QMainWindow):
 
 
 		def update_sequence(self):
-			x = generate_stirap_sequence(self.set_voltage, self.set_time)
+			x = generate_stirap_sequence(self.set_voltage, self.set_time, float(self.down_leg_v.text()))
 			if x:
 				self.up_sequence, self.down_sequence = x[0], x[1]
 			
@@ -76,6 +77,7 @@ class stirap_gui(QtGui.QMainWindow):
 			self.connect_update = QtGui.QPushButton('Connect and Update!')
 			self.up_leg_address = QtGui.QLineEdit('{0:d}'.format(UP_ADDRESS))
 			self.down_leg_address = QtGui.QLineEdit('{0:d}'.format(DOWN_ADDRESS))
+			self.down_leg_v = QtGui.QLineEdit(str(DOWN_V_KILLING))
 			self.status_bar = QtGui.QTextBrowser()
 			self.plot_window = plot_window()
 
@@ -100,6 +102,9 @@ class stirap_gui(QtGui.QMainWindow):
 			h1Left.addWidget(QtGui.QLabel('Down Leg Address: '))
 			h1Left.addWidget(self.down_leg_address)
 
+			h3Left = QtGui.QHBoxLayout()
+			h3Left.addWidget(QtGui.QLabel('Down Leg Darkly Resonant Voltage: '))
+			h3Left.addWidget(self.down_leg_v)
 
 			self.set_voltage = voltage_grid()			
 			self.set_time = time_grid()
@@ -113,6 +118,7 @@ class stirap_gui(QtGui.QMainWindow):
 			vLeft = QtGui.QVBoxLayout()
 			vLeft.addLayout(h0Left)
 			vLeft.addLayout(h1Left)
+			vLeft.addLayout(h3Left)
 			vLeft.addWidget(self.status_bar)
 			vLeft.addWidget(self.set_voltage)
 			vLeft.addWidget(self.set_time)

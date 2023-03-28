@@ -33,7 +33,7 @@ class time_grid(QtGui.QWidget):
 		self.t_on = QtGui.QLineEdit('{0:.1f}'.format(T_ON))
 		self.t_hold = QtGui.QLineEdit('{0:.1f}'.format(T_HOLD))
 		self.t_stirap = QtGui.QLineEdit('{0:.1f}'.format(T_STIRAP))
-		self.t_off = QtGui.QLineEdit('{0:.1f}'.format(T_OFF))
+		self.t_delay = QtGui.QLineEdit('{0:.1f}'.format(T_DELAY))
 		self.t_max = QtGui.QLineEdit('{0:.1f}'.format(T_MAX))
 		self.t_seq = QtGui.QLineEdit()
 		
@@ -52,8 +52,8 @@ class time_grid(QtGui.QWidget):
 		self.grid.addWidget(self.t_stirap, 0, 3, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_Hold'), 1, 0, 1, 1)
 		self.grid.addWidget(self.t_hold, 1, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Off'), 1, 2, 1, 1)
-		self.grid.addWidget(self.t_off, 1, 3, 1, 1)
+		self.grid.addWidget(QtGui.QLabel('T_Delay'), 1, 2, 1, 1)
+		self.grid.addWidget(self.t_delay, 1, 3, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_Max'), 2, 0, 1, 1)
 		self.grid.addWidget(self.t_max, 2, 1, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_seq'), 2, 2, 1, 1)
@@ -79,7 +79,7 @@ class plot_window(QtGui.QWidget):
 
 		self.setLayout(self.layout)
 
-def generate_stirap_sequence(voltage_data, time_data):
+def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	voltages = [] # List containing [up max voltage, down max voltage]
 	times = []
 
@@ -95,15 +95,15 @@ def generate_stirap_sequence(voltage_data, time_data):
 		times.append(float(time_data.t_on.text()))
 		times.append(float(time_data.t_hold.text()))
 		times.append(float(time_data.t_stirap.text()))
-		times.append(float(time_data.t_off.text()))
+		times.append(float(time_data.t_delay.text()))
 	except ValueError:
 		print('Time input could not be converted to float')
 		return 0
 
 	t_sequence = sum(times)
 
-	if t_sequence >= T_MAX/2.0:
-		print('ERROR: Sequence time longer than T_MAX/2.')
+	if t_sequence >= T_MAX/4.0:
+		print('ERROR: Sequence time longer than T_MAX/4.')
 		return 0
 	else:
 		time_data.t_seq.setText('{0:.1f}'.format(t_sequence))
@@ -124,13 +124,22 @@ def generate_stirap_sequence(voltage_data, time_data):
 	n_on = int(times[0]/DT)
 	n_hold = int(times[1]/DT)
 	n_stirap = int(times[2]/DT)
-	n_off = int(times[2]/DT)
-	n_sequence = n_on + n_hold + n_stirap + n_off
+	n_off = n_stirap ## this was used like this before (times[2])
+	n_delay = int(times[3]/DT)
+
+	n_sequence = n_on + n_hold + n_stirap + n_off + n_delay
+
+	t_up = 5
+	t_down = 100 - 2 * t_up
+	n_up = int(t_up/DT)
+	n_down = int(t_down/DT)
+	v_up_dr = 1500.0/V_MAX
+	v_down_dr = min(down_leg_v,V_MAX)/V_MAX
 
 	# Program in the up leg sequence
-	sequence_up[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(0.0, v_up, n_stirap)
-	sequence_up[n_on+n_hold+n_stirap : n_sequence] = np.linspace(v_up, v_up, n_off)
-	sequence_up[n_sequence : N/2] = v_up * np.ones(N/2 - n_sequence)
+	sequence_up[n_on+n_hold+n_delay : n_on+n_hold+n_stirap+n_delay] = np.linspace(0.0, v_up, n_stirap)
+	sequence_up[n_on+n_hold+n_stirap+n_delay : n_sequence] = np.linspace(v_up, v_up, n_off)
+	sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
 
 	# Program in the down leg sequence
 	sequence_down[0 : n_on] = np.linspace(0.0, v_down, n_on)
@@ -138,8 +147,15 @@ def generate_stirap_sequence(voltage_data, time_data):
 	sequence_down[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(v_down, 0.0, n_stirap)
 
 	# Mirror the sequences to generate dissociation pulse
-	sequence_up[N/2 : N/2+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
-	sequence_down[N/2 : N/2+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+	sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
+	sequence_down[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+
+	# Program in the dark resonance at the end
+	sequence_up[-n_up:] = np.linspace(v_up_dr, 0, n_up)
+	sequence_up[-(n_up+n_down):-n_up] = v_up_dr * np.ones(n_down)
+	sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, v_up_dr, n_up)
+
+	sequence_down[-(n_up+n_down):-n_up] = v_down_dr * np.ones(n_down)
 
 	return sequence_up, sequence_down
 
