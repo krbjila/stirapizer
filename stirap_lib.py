@@ -33,7 +33,7 @@ class time_grid(QtGui.QWidget):
 		self.t_on = QtGui.QLineEdit('{0:.1f}'.format(T_ON))
 		self.t_hold = QtGui.QLineEdit('{0:.1f}'.format(T_HOLD))
 		self.t_stirap = QtGui.QLineEdit('{0:.1f}'.format(T_STIRAP))
-		self.t_off = QtGui.QLineEdit('{0:.1f}'.format(T_OFF))
+		self.t_delay = QtGui.QLineEdit('{0:.1f}'.format(T_DELAY))
 		self.t_max = QtGui.QLineEdit('{0:.1f}'.format(T_MAX))
 		self.t_seq = QtGui.QLineEdit()
 		
@@ -52,8 +52,8 @@ class time_grid(QtGui.QWidget):
 		self.grid.addWidget(self.t_stirap, 0, 3, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_Hold'), 1, 0, 1, 1)
 		self.grid.addWidget(self.t_hold, 1, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Off'), 1, 2, 1, 1)
-		self.grid.addWidget(self.t_off, 1, 3, 1, 1)
+		self.grid.addWidget(QtGui.QLabel('T_Delay'), 1, 2, 1, 1)
+		self.grid.addWidget(self.t_delay, 1, 3, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_Max'), 2, 0, 1, 1)
 		self.grid.addWidget(self.t_max, 2, 1, 1, 1)
 		self.grid.addWidget(QtGui.QLabel('T_seq'), 2, 2, 1, 1)
@@ -95,7 +95,7 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 		times.append(float(time_data.t_on.text()))
 		times.append(float(time_data.t_hold.text()))
 		times.append(float(time_data.t_stirap.text()))
-		times.append(float(time_data.t_off.text()))
+		times.append(float(time_data.t_delay.text()))
 	except ValueError:
 		print('Time input could not be converted to float')
 		return 0
@@ -124,8 +124,10 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	n_on = int(times[0]/DT)
 	n_hold = int(times[1]/DT)
 	n_stirap = int(times[2]/DT)
-	n_off = int(times[2]/DT)
-	n_sequence = n_on + n_hold + n_stirap + n_off
+	n_off = n_stirap ## this was used like this before (times[2])
+	n_delay = int(times[3]/DT)
+
+	n_sequence = n_on + n_hold + n_stirap + n_off + n_delay
 
 	t_up = 5
 	t_down = 100 - 2 * t_up
@@ -135,8 +137,8 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	v_down_dr = min(down_leg_v,V_MAX)/V_MAX
 
 	# Program in the up leg sequence
-	sequence_up[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(0.0, v_up, n_stirap)
-	sequence_up[n_on+n_hold+n_stirap : n_sequence] = np.linspace(v_up, v_up, n_off)
+	sequence_up[n_on+n_hold+n_delay : n_on+n_hold+n_stirap+n_delay] = np.linspace(0.0, v_up, n_stirap)
+	sequence_up[n_on+n_hold+n_stirap+n_delay : n_sequence] = np.linspace(v_up, v_up, n_off)
 	sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
 
 	# Program in the down leg sequence
