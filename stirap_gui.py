@@ -1,12 +1,12 @@
 import sys, os
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from stirap_lib import *
 from stirap_defaults import *
 import numpy as np
 
 
 
-class stirap_gui(QtGui.QMainWindow):
+class stirap_gui(QtWidgets.QMainWindow):
 		def __init__(self, Parent=None):
 				super(stirap_gui, self).__init__(Parent)
 				self.setWindowTitle('STIRAPizer')
@@ -18,6 +18,7 @@ class stirap_gui(QtGui.QMainWindow):
 				self.set_time.t_hold.returnPressed.connect(self.update_sequence)
 				self.set_time.t_stirap.returnPressed.connect(self.update_sequence)
 				self.set_time.t_delay.returnPressed.connect(self.update_sequence)
+				self.set_time.t_delay2.returnPressed.connect(self.update_sequence)
 
 				self.set_voltage.up_max_v.returnPressed.connect(self.update_sequence)
 				self.set_voltage.down_max_v.returnPressed.connect(self.update_sequence)
@@ -74,48 +75,48 @@ class stirap_gui(QtGui.QMainWindow):
 
 		def initialize(self):
 
-			self.connect_update = QtGui.QPushButton('Connect and Update!')
-			self.up_leg_address = QtGui.QLineEdit('{0:d}'.format(UP_ADDRESS))
-			self.down_leg_address = QtGui.QLineEdit('{0:d}'.format(DOWN_ADDRESS))
-			self.down_leg_v = QtGui.QLineEdit(str(DOWN_V_KILLING))
-			self.status_bar = QtGui.QTextBrowser()
+			self.connect_update = QtWidgets.QPushButton('Connect and Update!')
+			self.up_leg_address = QtWidgets.QLineEdit('{0:d}'.format(UP_ADDRESS))
+			self.down_leg_address = QtWidgets.QLineEdit('{0:d}'.format(DOWN_ADDRESS))
+			self.down_leg_v = QtWidgets.QLineEdit(str(DOWN_V_KILLING))
+			self.status_bar = QtWidgets.QTextBrowser()
 			self.plot_window = plot_window()
 
-			self.mode_select = QtGui.QComboBox()
+			self.mode_select = QtWidgets.QComboBox()
 			self.mode_select.addItems(MODES)
 
 			self.up_sequence = np.zeros(N)
 			self.down_sequence = np.zeros(N)
 
-			title = QtGui.QLabel('STIRAPizer')
-			title_font = QtGui.QFont("Helvetica [Cronyx]", 16, QtGui.QFont.Bold)
+			title = QtWidgets.QLabel('STIRAPizer')
+			#title_font = QtWidgets.Font("Helvetica [Cronyx]", 16, QtWidgets.Font.Bold)
 			title.setText("<font color=\"blue\">STI</font><font color=\"red\">RAP</font><font color=\"black\">izer</font>")
-			title.setFont(title_font)
+			#title.setFont(title_font)
 
-			h0Left = QtGui.QHBoxLayout()
+			h0Left = QtWidgets.QHBoxLayout()
 			h0Left.addWidget(title)
 			h0Left.addWidget(self.connect_update)
 
-			h1Left = QtGui.QHBoxLayout()
-			h1Left.addWidget(QtGui.QLabel('Up Leg Address: '))
+			h1Left = QtWidgets.QHBoxLayout()
+			h1Left.addWidget(QtWidgets.QLabel('Up Leg Address: '))
 			h1Left.addWidget(self.up_leg_address)
-			h1Left.addWidget(QtGui.QLabel('Down Leg Address: '))
+			h1Left.addWidget(QtWidgets.QLabel('Down Leg Address: '))
 			h1Left.addWidget(self.down_leg_address)
 
-			h3Left = QtGui.QHBoxLayout()
-			h3Left.addWidget(QtGui.QLabel('Down Leg Darkly Resonant Voltage: '))
+			h3Left = QtWidgets.QHBoxLayout()
+			h3Left.addWidget(QtWidgets.QLabel('Down Leg Darkly Resonant Voltage: '))
 			h3Left.addWidget(self.down_leg_v)
 
 			self.set_voltage = voltage_grid()			
 			self.set_time = time_grid()
 
-			h2Left = QtGui.QHBoxLayout()
+			h2Left = QtWidgets.QHBoxLayout()
 			h2Left.stretch(1)
 			h2Left.addWidget(self.mode_select)
 			h2Left.stretch(1)
 
 
-			vLeft = QtGui.QVBoxLayout()
+			vLeft = QtWidgets.QVBoxLayout()
 			vLeft.addLayout(h0Left)
 			vLeft.addLayout(h1Left)
 			vLeft.addLayout(h3Left)
@@ -125,18 +126,18 @@ class stirap_gui(QtGui.QMainWindow):
 			vLeft.addLayout(h2Left)
 
 
-			hmain = QtGui.QHBoxLayout()
+			hmain = QtWidgets.QHBoxLayout()
 			hmain.addLayout(vLeft)
 			hmain.addWidget(self.plot_window)
 
 
-			self.mainWidget = QtGui.QWidget()
+			self.mainWidget = QtWidgets.QWidget()
 			self.mainWidget.setLayout(hmain)
 			self.setCentralWidget(self.mainWidget)
 
 
 if __name__ == "__main__":
-		app = QtGui.QApplication(sys.argv)
+		app = QtWidgets.QApplication(sys.argv)
 
 		w = stirap_gui()
 		w.setGeometry(100, 100, 800, 400)

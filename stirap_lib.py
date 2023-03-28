@@ -1,41 +1,42 @@
-from PyQt4 import QtGui, QtCore
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+from PyQt5 import QtWidgets, QtCore
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from stirap_defaults import *
 import numpy as np
 import visa
 from time import sleep
 
-class voltage_grid(QtGui.QWidget):
+class voltage_grid(QtWidgets.QWidget):
 	def __init__(self, Parent=None):
 		super(voltage_grid, self).__init__(Parent)
-		self.up_max_v = QtGui.QLineEdit('{0:.1f}'.format(UP_V_STIRAP))
-		self.down_max_v = QtGui.QLineEdit('{0:.1f}'.format(DOWN_V_STIRAP))
+		self.up_max_v = QtWidgets.QLineEdit('{0:.1f}'.format(UP_V_STIRAP))
+		self.down_max_v = QtWidgets.QLineEdit('{0:.1f}'.format(DOWN_V_STIRAP))
 		self.setup()
 
 	def setup(self):
-		self.grid = QtGui.QGridLayout()
+		self.grid = QtWidgets.QGridLayout()
 		set_voltage_labels = ['Up', 'Down']
 		for k, val in enumerate(set_voltage_labels):
-			x = QtGui.QLabel(val)
+			x = QtWidgets.QLabel(val)
 			self.grid.addWidget(x, 0, k+1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('Max Voltage (mV)'), 1, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('Max Voltage (mV)'), 1, 0, 1, 1)
 		self.grid.addWidget(self.up_max_v, 1, 1, 1, 1)
 		self.grid.addWidget(self.down_max_v, 1, 2, 1, 1)
 
 		self.setLayout(self.grid)
 
-class time_grid(QtGui.QWidget):
+class time_grid(QtWidgets.QWidget):
 	def __init__(self, Parent=None):
 		super(time_grid, self).__init__(Parent)
 
-		self.t_on = QtGui.QLineEdit('{0:.1f}'.format(T_ON))
-		self.t_hold = QtGui.QLineEdit('{0:.1f}'.format(T_HOLD))
-		self.t_stirap = QtGui.QLineEdit('{0:.1f}'.format(T_STIRAP))
-		self.t_delay = QtGui.QLineEdit('{0:.1f}'.format(T_DELAY))
-		self.t_max = QtGui.QLineEdit('{0:.1f}'.format(T_MAX))
-		self.t_seq = QtGui.QLineEdit()
+		self.t_on = QtWidgets.QLineEdit('{0:.1f}'.format(T_ON))
+		self.t_hold = QtWidgets.QLineEdit('{0:.1f}'.format(T_HOLD))
+		self.t_stirap = QtWidgets.QLineEdit('{0:.1f}'.format(T_STIRAP))
+		self.t_delay = QtWidgets.QLineEdit('{0:.1f}'.format(T_DELAY))
+		self.t_delay2 = QtWidgets.QLineEdit('{0:.1f}'.format(T_DELAY2))
+		self.t_max = QtWidgets.QLineEdit('{0:.1f}'.format(T_MAX))
+		self.t_seq = QtWidgets.QLineEdit()
 		
 		self.t_max.setDisabled(True)
 		self.t_seq.setDisabled(True)
@@ -44,25 +45,27 @@ class time_grid(QtGui.QWidget):
 		self.setup()
 
 	def setup(self):
-		self.grid = QtGui.QGridLayout()
+		self.grid = QtWidgets.QGridLayout()
 
-		self.grid.addWidget(QtGui.QLabel('T_On'), 0, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_On'), 0, 0, 1, 1)
 		self.grid.addWidget(self.t_on, 0, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Stirap'), 0, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Stirap'), 0, 2, 1, 1)
 		self.grid.addWidget(self.t_stirap, 0, 3, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Hold'), 1, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Hold'), 1, 0, 1, 1)
 		self.grid.addWidget(self.t_hold, 1, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Delay'), 1, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Delay'), 1, 2, 1, 1)
 		self.grid.addWidget(self.t_delay, 1, 3, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Max'), 2, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Delay2'), 3, 2, 1, 1)
+		self.grid.addWidget(self.t_delay2, 3, 3, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Max'), 2, 0, 1, 1)
 		self.grid.addWidget(self.t_max, 2, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_seq'), 2, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_seq'), 2, 2, 1, 1)
 		self.grid.addWidget(self.t_seq, 2, 3, 1, 1)
 
 		self.setLayout(self.grid)
 
 
-class plot_window(QtGui.QWidget):
+class plot_window(QtWidgets.QWidget):
 	def __init__(self,Parent=None):
 		super(plot_window,self).__init__(Parent)
 		self.setup()
@@ -73,7 +76,7 @@ class plot_window(QtGui.QWidget):
 		self.toolbar = NavigationToolbar(self.canvas,self)
 		self.ax = self.figure.add_subplot(111)
 
-		self.layout = QtGui.QGridLayout()
+		self.layout = QtWidgets.QGridLayout()
 		self.layout.addWidget(self.toolbar,0,0,1,4)
 		self.layout.addWidget(self.canvas,1,0,4,4)
 
@@ -96,6 +99,7 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 		times.append(float(time_data.t_hold.text()))
 		times.append(float(time_data.t_stirap.text()))
 		times.append(float(time_data.t_delay.text()))
+		times.append(float(time_data.t_delay2.text()))
 	except ValueError:
 		print('Time input could not be converted to float')
 		return 0
@@ -126,6 +130,7 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	n_stirap = int(times[2]/DT)
 	n_off = n_stirap ## this was used like this before (times[2])
 	n_delay = int(times[3]/DT)
+	n_delay2 = int(times[4]/DT)
 
 	n_sequence = n_on + n_hold + n_stirap + n_off + n_delay
 
@@ -141,6 +146,8 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	sequence_up[n_on+n_hold+n_stirap+n_delay : n_sequence] = np.linspace(v_up, v_up, n_off)
 	sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
 
+	### continue here ... 
+
 	# Program in the down leg sequence
 	sequence_down[0 : n_on] = np.linspace(0.0, v_down, n_on)
 	sequence_down[n_on : n_on+n_hold] = v_down * np.ones(n_hold)
@@ -148,7 +155,7 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 
 	# Mirror the sequences to generate dissociation pulse
 	sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
-	sequence_down[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+	sequence_down[int(N/4) : int(N/4)+n_sequence-n_delay2-n_delay] = np.flipud(sequence_down[0 : n_sequence-n_delay2-n_delay])
 
 	# Program in the dark resonance at the end
 	sequence_up[-n_up:] = np.linspace(v_up_dr, 0, n_up)

@@ -20,7 +20,7 @@ T_ON = 4.0
 T_STIRAP = 3.5
 T_HOLD = 2.0
 T_DELAY = -1
-
+T_DELAY2 = -1
 
 ##################### FG Defaults ####################
 ########### DO NOT MODIFY THESE PARAMETERS ###########
