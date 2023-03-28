@@ -17,7 +17,7 @@ class stirap_gui(QtGui.QMainWindow):
 				self.set_time.t_on.returnPressed.connect(self.update_sequence)
 				self.set_time.t_hold.returnPressed.connect(self.update_sequence)
 				self.set_time.t_stirap.returnPressed.connect(self.update_sequence)
-				self.set_time.t_off.returnPressed.connect(self.update_sequence)
+				self.set_time.t_delay.returnPressed.connect(self.update_sequence)
 
 				self.set_voltage.up_max_v.returnPressed.connect(self.update_sequence)
 				self.set_voltage.down_max_v.returnPressed.connect(self.update_sequence)
