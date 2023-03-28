@@ -1,5 +1,5 @@
 import sys, os
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from stirap_lib import *
 from stirap_defaults import *
 import numpy as np
@@ -70,6 +70,7 @@ class stirap_gui(QtWidgets.QMainWindow):
 			self.plot_window.ax.set_xlim((0, T_MAX))
 			self.plot_window.ax.legend(['Up Leg', 'Down Leg'])
 
+			self.plot_window.ax.tick_params(which="both", direction='in')
 			self.plot_window.figure.subplots_adjust(bottom=0.15, left=0.15)
 			self.plot_window.canvas.draw()
 
@@ -89,9 +90,9 @@ class stirap_gui(QtWidgets.QMainWindow):
 			self.down_sequence = np.zeros(N)
 
 			title = QtWidgets.QLabel('STIRAPizer')
-			#title_font = QtWidgets.Font("Helvetica [Cronyx]", 16, QtWidgets.Font.Bold)
+			title_font = QtGui.QFont("Helvetica [Cronyx]", 16, QtGui.QFont.Bold)
 			title.setText("<font color=\"blue\">STI</font><font color=\"red\">RAP</font><font color=\"black\">izer</font>")
-			#title.setFont(title_font)
+			title.setFont(title_font)
 
 			h0Left = QtWidgets.QHBoxLayout()
 			h0Left.addWidget(title)
