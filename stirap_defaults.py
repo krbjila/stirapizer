@@ -19,7 +19,7 @@ DOWN_V_STIRAP = 900.0
 T_ON = 4.0
 T_STIRAP = 3.5
 T_HOLD = 2.0
-T_DELAY = 7.0
+T_DELAY = -1
 
 
 ##################### FG Defaults ####################
