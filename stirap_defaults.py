@@ -30,7 +30,7 @@ V_MAX = 2000.0		# Maximum voltage [mV]
 V_MIN = 0.0			# Minimum voltage [mV]
 N = 2**16			# Number of bytes in memory
 
-MODES = ['STIRAP', 'Dark Resonance']
+MODES = ['STIRAP', 'Dark Resonance', 'Sine']
 
 ############### Derived Quantities ##################
 

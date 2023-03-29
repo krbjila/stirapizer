@@ -82,7 +82,7 @@ class plot_window(QtWidgets.QWidget):
 
 		self.setLayout(self.layout)
 
-def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
+def generate_stirap_sequence(voltage_data, time_data, down_leg_v, sine=False):
 	voltages = [] # List containing [up max voltage, down max voltage]
 	times = []
 
@@ -125,44 +125,64 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v):
 	sequence_up = np.zeros(N)
 	sequence_down = np.zeros(N)
 
-	n_on = int(times[0]/DT)
-	n_hold = int(times[1]/DT)
-	n_stirap = int(times[2]/DT)
-	n_off = n_stirap ## this was used like this before (times[2])
-	n_delay = int(times[3]/DT)
-	n_delay2 = int(times[4]/DT)
+	if sine:
+		n_stirap = int(times[2]/DT)
+		n_delay = int(times[3]/DT)
+		n_delay2 = n_delay
+		n_delay_down = 0
 
-	n_sequence = n_on + n_hold + n_stirap + n_off + n_delay
+		if n_delay < 0:
+			n_delay_down = -n_delay
+			n_delay = 0
 
-	t_up = 5
-	t_down = 100 - 2 * t_up
-	n_up = int(t_up/DT)
-	n_down = int(t_down/DT)
-	v_up_dr = 1500.0/V_MAX
-	v_down_dr = min(down_leg_v,V_MAX)/V_MAX
+		n_sequence = n_stirap + max(n_delay, n_delay_down)
 
-	# Program in the up leg sequence
-	sequence_up[n_on+n_hold+n_delay : n_on+n_hold+n_stirap+n_delay] = np.linspace(0.0, v_up, n_stirap)
-	sequence_up[n_on+n_hold+n_stirap+n_delay : n_sequence] = np.linspace(v_up, v_up, n_off)
-	sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
+		cos_samples = np.sin(np.pi * np.arange(n_stirap) / n_stirap)
 
-	### continue here ... 
+		sequence_down[n_delay_down : n_delay_down + n_stirap] = v_down *cos_samples
+		sequence_up[n_delay : n_delay + n_stirap] = v_up * cos_samples
 
-	# Program in the down leg sequence
-	sequence_down[0 : n_on] = np.linspace(0.0, v_down, n_on)
-	sequence_down[n_on : n_on+n_hold] = v_down * np.ones(n_hold)
-	sequence_down[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(v_down, 0.0, n_stirap)
+		# Mirror the sequences to generate dissociation pulse
+		sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
+		sequence_down[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_down[0 : n_sequence])
+	else:
+		n_on = int(times[0]/DT)
+		n_hold = int(times[1]/DT)
+		n_stirap = int(times[2]/DT)
+		n_off = n_stirap ## this was used like this before (times[2])
+		n_delay = int(times[3]/DT)
+		n_delay2 = int(times[4]/DT)
 
-	# Mirror the sequences to generate dissociation pulse
-	sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
-	sequence_down[int(N/4) : int(N/4)+n_sequence-n_delay2-n_delay] = np.flipud(sequence_down[0 : n_sequence-n_delay2-n_delay])
+		n_sequence = n_on + n_hold + n_stirap + n_off + n_delay
 
-	# Program in the dark resonance at the end
-	sequence_up[-n_up:] = np.linspace(v_up_dr, 0, n_up)
-	sequence_up[-(n_up+n_down):-n_up] = v_up_dr * np.ones(n_down)
-	sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, v_up_dr, n_up)
+		t_up = 5
+		t_down = 100 - 2 * t_up
+		n_up = int(t_up/DT)
+		n_down = int(t_down/DT)
+		v_up_dr = 1500.0/V_MAX
+		v_down_dr = min(down_leg_v,V_MAX)/V_MAX
 
-	sequence_down[-(n_up+n_down):-n_up] = v_down_dr * np.ones(n_down)
+		# Program in the up leg sequence
+		sequence_up[n_on+n_hold+n_delay : n_on+n_hold+n_stirap+n_delay] = np.linspace(0.0, v_up, n_stirap)
+		sequence_up[n_on+n_hold+n_stirap+n_delay : n_sequence] = np.linspace(v_up, v_up, n_off)
+		sequence_up[n_sequence : int(N/4)] = v_up * np.ones(int(N/4) - n_sequence)
+
+		### continue here ... 
+
+		# Program in the down leg sequence
+		sequence_down[0 : n_on] = np.linspace(0.0, v_down, n_on)
+		sequence_down[n_on : n_on+n_hold] = v_down * np.ones(n_hold)
+		sequence_down[n_on+n_hold : n_on+n_hold+n_stirap] = np.linspace(v_down, 0.0, n_stirap)
+
+		# Program in the dark resonance at the end
+		sequence_up[-n_up:] = np.linspace(v_up_dr, 0, n_up)
+		sequence_up[-(n_up+n_down):-n_up] = v_up_dr * np.ones(n_down)
+		sequence_up[-(2*n_up+n_down):-(n_up+n_down)] = np.linspace(0, v_up_dr, n_up)
+		sequence_down[-(n_up+n_down):-n_up] = v_down_dr * np.ones(n_down)
+
+		# Mirror the sequences to generate dissociation pulse
+		sequence_up[int(N/4) : int(N/4)+n_sequence] = np.flipud(sequence_up[0 : n_sequence])
+		sequence_down[int(N/4) : int(N/4)+n_sequence-n_delay2-n_delay] = np.flipud(sequence_down[0 : n_sequence-n_delay2-n_delay])
 
 	return sequence_up, sequence_down
 

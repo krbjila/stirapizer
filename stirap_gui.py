@@ -32,7 +32,7 @@ class stirap_gui(QtWidgets.QMainWindow):
 
 
 		def update_sequence(self):
-			x = generate_stirap_sequence(self.set_voltage, self.set_time, float(self.down_leg_v.text()))
+			x = generate_stirap_sequence(self.set_voltage, self.set_time, float(self.down_leg_v.text()), self.mode_select.currentText() == 'Sine')
 			if x:
 				self.up_sequence, self.down_sequence = x[0], x[1]
 			
@@ -58,7 +58,7 @@ class stirap_gui(QtWidgets.QMainWindow):
 
 			self.plot_window.ax.cla()
 
-			if self.mode_select.currentText() == "STIRAP":
+			if self.mode_select.currentText() == "STIRAP" or self.mode_select.currentText() == "Sine":
 				self.plot_window.ax.plot(np.arange(N)*DT, self.up_sequence*V_MAX, 'r')
 				self.plot_window.ax.plot(np.arange(N)*DT, self.down_sequence*V_MAX, 'b')
 			elif self.mode_select.currentText() == "Dark Resonance":
