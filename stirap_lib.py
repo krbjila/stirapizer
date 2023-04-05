@@ -137,7 +137,7 @@ def generate_stirap_sequence(voltage_data, time_data, down_leg_v, sine=False):
 
 		n_sequence = n_stirap + max(n_delay, n_delay_down)
 
-		cos_samples = np.sin(np.pi * np.arange(n_stirap) / n_stirap)
+		cos_samples = np.power(np.sin(np.pi * np.arange(n_stirap) / n_stirap), 2)
 
 		sequence_down[n_delay_down : n_delay_down + n_stirap] = v_down *cos_samples
 		sequence_up[n_delay : n_delay + n_stirap] = v_up * cos_samples
