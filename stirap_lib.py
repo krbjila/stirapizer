@@ -1,41 +1,41 @@
-from PyQt4 import QtGui, QtCore
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+from PyQt5 import QtGui, QtCore, QtWidgets
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 from stirap_defaults import *
 import numpy as np
-import visa
+import pyvisa as visa
 from time import sleep
 
-class voltage_grid(QtGui.QWidget):
+class voltage_grid(QtWidgets.QWidget):
 	def __init__(self, Parent=None):
 		super(voltage_grid, self).__init__(Parent)
-		self.up_max_v = QtGui.QLineEdit('{0:.1f}'.format(UP_V_STIRAP))
-		self.down_max_v = QtGui.QLineEdit('{0:.1f}'.format(DOWN_V_STIRAP))
+		self.up_max_v = QtWidgets.QLineEdit('{0:.1f}'.format(UP_V_STIRAP))
+		self.down_max_v = QtWidgets.QLineEdit('{0:.1f}'.format(DOWN_V_STIRAP))
 		self.setup()
 
 	def setup(self):
-		self.grid = QtGui.QGridLayout()
+		self.grid = QtWidgets.QGridLayout()
 		set_voltage_labels = ['Up', 'Down']
 		for k, val in enumerate(set_voltage_labels):
-			x = QtGui.QLabel(val)
+			x = QtWidgets.QLabel(val)
 			self.grid.addWidget(x, 0, k+1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('Max Voltage (mV)'), 1, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('Max Voltage (mV)'), 1, 0, 1, 1)
 		self.grid.addWidget(self.up_max_v, 1, 1, 1, 1)
 		self.grid.addWidget(self.down_max_v, 1, 2, 1, 1)
 
 		self.setLayout(self.grid)
 
-class time_grid(QtGui.QWidget):
+class time_grid(QtWidgets.QWidget):
 	def __init__(self, Parent=None):
 		super(time_grid, self).__init__(Parent)
 
-		self.t_on = QtGui.QLineEdit('{0:.1f}'.format(T_ON))
-		self.t_hold = QtGui.QLineEdit('{0:.1f}'.format(T_HOLD))
-		self.t_stirap = QtGui.QLineEdit('{0:.1f}'.format(T_STIRAP))
-		self.t_delay = QtGui.QLineEdit('{0:.1f}'.format(T_DELAY))
-		self.t_max = QtGui.QLineEdit('{0:.1f}'.format(T_MAX))
-		self.t_seq = QtGui.QLineEdit()
+		self.t_on = QtWidgets.QLineEdit('{0:.1f}'.format(T_ON))
+		self.t_hold = QtWidgets.QLineEdit('{0:.1f}'.format(T_HOLD))
+		self.t_stirap = QtWidgets.QLineEdit('{0:.1f}'.format(T_STIRAP))
+		self.t_delay = QtWidgets.QLineEdit('{0:.1f}'.format(T_DELAY))
+		self.t_max = QtWidgets.QLineEdit('{0:.1f}'.format(T_MAX))
+		self.t_seq = QtWidgets.QLineEdit()
 		
 		self.t_max.setDisabled(True)
 		self.t_seq.setDisabled(True)
@@ -44,25 +44,25 @@ class time_grid(QtGui.QWidget):
 		self.setup()
 
 	def setup(self):
-		self.grid = QtGui.QGridLayout()
+		self.grid = QtWidgets.QGridLayout()
 
-		self.grid.addWidget(QtGui.QLabel('T_On'), 0, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_On'), 0, 0, 1, 1)
 		self.grid.addWidget(self.t_on, 0, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Stirap'), 0, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Stirap'), 0, 2, 1, 1)
 		self.grid.addWidget(self.t_stirap, 0, 3, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Hold'), 1, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Hold'), 1, 0, 1, 1)
 		self.grid.addWidget(self.t_hold, 1, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Delay'), 1, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Delay'), 1, 2, 1, 1)
 		self.grid.addWidget(self.t_delay, 1, 3, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_Max'), 2, 0, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_Max'), 2, 0, 1, 1)
 		self.grid.addWidget(self.t_max, 2, 1, 1, 1)
-		self.grid.addWidget(QtGui.QLabel('T_seq'), 2, 2, 1, 1)
+		self.grid.addWidget(QtWidgets.QLabel('T_seq'), 2, 2, 1, 1)
 		self.grid.addWidget(self.t_seq, 2, 3, 1, 1)
 
 		self.setLayout(self.grid)
 
 
-class plot_window(QtGui.QWidget):
+class plot_window(QtWidgets.QWidget):
 	def __init__(self,Parent=None):
 		super(plot_window,self).__init__(Parent)
 		self.setup()
@@ -73,7 +73,7 @@ class plot_window(QtGui.QWidget):
 		self.toolbar = NavigationToolbar(self.canvas,self)
 		self.ax = self.figure.add_subplot(111)
 
-		self.layout = QtGui.QGridLayout()
+		self.layout = QtWidgets.QGridLayout()
 		self.layout.addWidget(self.toolbar,0,0,1,4)
 		self.layout.addWidget(self.canvas,1,0,4,4)
 
