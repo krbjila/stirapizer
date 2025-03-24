@@ -1,4 +1,4 @@
-""" Default values for Function Generator Control """
+"""Default values for Function Generator Control"""
 
 #################### FG Addresses ####################
 UP_ADDRESS = 9
@@ -17,23 +17,22 @@ UP_V_STIRAP = 1500.0
 DOWN_V_STIRAP = 900.0
 
 T_ON = 4.0
-T_STIRAP = 3.5
+T_STIRAP = 10
 T_HOLD = 2.0
-T_DELAY = -1
+T_DELAY = -2.0
 
 
 ##################### FG Defaults ####################
 ########### DO NOT MODIFY THESE PARAMETERS ###########
 
-T_MAX = 200.0		# Total sequence time [us]
-V_MAX = 2000.0		# Maximum voltage [mV]
-V_MIN = 0.0			# Minimum voltage [mV]
-N = 2**16			# Number of bytes in memory
+T_MAX = 200.0  # Total sequence time [us]
+V_MAX = 2000.0  # Maximum voltage [mV]
+V_MIN = 0.0  # Minimum voltage [mV]
+N = 2**16  # Number of bytes in memory
 
-MODES = ['STIRAP', 'Dark Resonance']
+MODES = ["STIRAP", "Dark Resonance"]
 
 ############### Derived Quantities ##################
 
-DT = T_MAX/float(N) # Time Step [us]
-FREQ = 1.0E6/T_MAX	# Maximum frequency [Hz]
-
+DT = T_MAX / float(N)  # Time Step [us]
+FREQ = 1.0e6 / T_MAX  # Maximum frequency [Hz]
